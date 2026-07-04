@@ -1,0 +1,39 @@
+{
+  "name": "career-ops-plugin-docx",
+  "version": "0.1.0",
+  "description": "Export your cv.md to a clean, ATS-friendly Word .docx, honoring #### nested sub-roles for fractional, interim, and umbrella engagements.",
+  "license": "MIT",
+  "author": "Dax Davis <dax@rubicontv.com>",
+  "homepage": "https://github.com/rubicon/career-ops-plugin-docx#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rubicon/career-ops-plugin-docx.git"
+  },
+  "bugs": {
+    "url": "https://github.com/rubicon/career-ops-plugin-docx/issues"
+  },
+  "keywords": [
+    "career-ops",
+    "career-ops-plugin",
+    "docx",
+    "word",
+    "resume",
+    "cv",
+    "ats"
+  ],
+  "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "test": "node test/smoke.mjs",
+    "cv": "node bin/generate-docx.mjs",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.6.1",
+    "@commitlint/config-conventional": "^19.6.0",
+    "prettier": "^3.4.2"
+  }
+}

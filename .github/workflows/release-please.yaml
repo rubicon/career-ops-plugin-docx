@@ -1,0 +1,31 @@
+name: release-please
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release-please:
+    name: Propose release
+    runs-on: ubuntu-latest
+    steps:
+      # A GitHub App token gives release-please a signing identity, so the
+      # commits it creates are verified. Wire the RELEASE_PLEASE_APP_ID and
+      # RELEASE_PLEASE_APP_KEY secrets before this workflow can run. See README.
+      - name: Mint app token
+        uses: actions/create-github-app-token@5d869da34e18e7287c1daad50e0b8ea0f506ce69 # v1.11.0
+        id: app-token
+        with:
+          app-id: ${{ secrets.RELEASE_PLEASE_APP_ID }}
+          private-key: ${{ secrets.RELEASE_PLEASE_APP_KEY }}
+
+      - name: Run release-please
+        uses: googleapis/release-please-action@5792afc6b46e9bb55deda9eda973a18c226bc3fc # v4.1.5
+        with:
+          token: ${{ steps.app-token.outputs.token }}
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
