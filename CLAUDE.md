@@ -7,7 +7,13 @@ repository. `AGENTS.md` is a pointer to this file.
 
 career-ops-plugin-docx is a [career-ops](https://github.com/santifer/career-ops)
 plugin that exports a Markdown CV (`cv.md`) to a Word `.docx`. It is small,
-local, and single-purpose.
+local, and single-purpose. Its reason to exist is the `####` nested sub-role:
+a `###` company/umbrella entry holds several `####` client engagements
+(fractional, interim, umbrella work) instead of flattening them into separate jobs.
+
+See `ARCHITECTURE.md` for the layout and data flow. Entry points: `index.mjs`
+(the `export` hook), `lib/cv-docx.mjs` (parser + OOXML renderer), `lib/zip.mjs`
+(dependency-free ZIP writer), `bin/generate-docx.mjs` (standalone CLI).
 
 ## Non-negotiable invariants
 
@@ -24,6 +30,13 @@ local, and single-purpose.
   fixture only (`examples/cv-fractional-example.md`). Never commit a real CV.
 - **Contained file access.** `cv_path` and `output_dir` are resolved and checked
   to stay inside the project directory. Keep that guard.
+
+## Commands
+
+- `npm test` runs the zero-network smoke test (parser, nested sub-roles, output validity, determinism).
+- `npm run format:check` / `npm run format` (Prettier).
+- In career-ops: `node plugins.mjs run docx export [--dry-run]` writes `output/cv-<name>.docx`.
+- Standalone: `npm run cv -- <input.md> <output.docx> [--format=letter|a4]` (wraps `bin/generate-docx.mjs`).
 
 ## Working conventions
 
