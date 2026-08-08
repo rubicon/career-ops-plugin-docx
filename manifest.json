@@ -1,7 +1,7 @@
 {
   "id": "docx",
   "name": "career-ops-plugin-docx",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "apiVersion": 1,
   "description": "Export your cv.md to a clean, ATS-friendly Word .docx, honoring #### nested sub-roles for fractional, interim, and umbrella engagements.",
   "hooks": [
