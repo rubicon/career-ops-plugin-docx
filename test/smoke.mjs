@@ -95,29 +95,31 @@ function zipPart(buf, name) {
   throw new Error(`part not found: ${name}`);
 }
 
+/**
+ * Cut a passage out of the bundled fixture, from `start` up to `end`.
+ * @param {string} start - Literal text the passage begins with.
+ * @param {string} [end] - Literal text that begins the following passage.
+ * @returns {string} The passage, trimmed.
+ */
+function fixtureSlice(start, end) {
+  const from = md.indexOf(start);
+  assert(from !== -1, `fixture no longer contains "${start}"`);
+  const to = end === undefined ? md.length : md.indexOf(end, from);
+  assert(to !== -1, `fixture no longer contains "${end}" after "${start}"`);
+  return md.slice(from, to).trim();
+}
+
+// The input is assembled out of the bundled fixture rather than written inline,
+// so `examples/cv-fractional-example.md` stays the only CV sample data in the
+// repo. The heading order under test is malformed on purpose and must not be
+// folded back into that fixture, which is a valid CV the README points readers
+// at: the ### and its #### are lifted above the first ## here instead.
 const leadingMd = [
-  '# CV -- Jordan Vale',
-  '',
-  '**Email:** jordan@example.com',
-  '',
-  '### Vale Advisory -- Remote (advisory practice)',
-  '',
-  '**Founder and Principal, Fractional Operations**',
-  '2021-Present',
-  '',
-  '- Ran concurrent fractional engagements for seed to Series B companies.',
-  '',
-  '#### NorthStar Analytics -- Interim VP Operations',
-  '',
-  '2023-2024',
-  '',
-  '- Stood up the first company-wide operating rhythm.',
-  '',
-  '## Education',
-  '',
-  '- BA Economics, University of Colorado Boulder (2015)',
-  '',
-].join('\n');
+  fixtureSlice('# CV -- Jordan Vale', '\n**Location:'), // the H1 alone
+  fixtureSlice('**Email:**', '\n**LinkedIn:'), // one contact line
+  fixtureSlice('### Vale Advisory', '\n#### Cobalt'), // a ### entry with one nested ####
+  fixtureSlice('## Education', '\n## Skills'), // a real ## section after the nesting
+].join('\n\n');
 
 const leading = parseCvMarkdown(leadingMd);
 assert.deepEqual(
@@ -136,11 +138,11 @@ assert(leadEntry && leadEntry.type === 'entry', 'the leading ### should parse as
 assert(/Vale Advisory/.test(leadEntry.company), 'leading entry company wrong');
 assert.equal(leadEntry.role, 'Founder and Principal, Fractional Operations', 'leading role lost');
 assert.equal(leadEntry.date, '2021-Present', 'leading date lost');
-assert.equal(leadEntry.bullets.length, 1, 'leading entry bullets lost');
+assert.equal(leadEntry.bullets.length, 2, 'leading entry bullets lost');
 assert.equal(leadEntry.subroles.length, 1, 'leading entry should keep its #### sub-role');
 assert(/NorthStar Analytics/.test(leadEntry.subroles[0].title), 'leading sub-role title wrong');
 assert.equal(leadEntry.subroles[0].date, '2023-2024', 'leading sub-role date lost');
-assert.equal(leadEntry.subroles[0].bullets.length, 1, 'leading sub-role bullets lost');
+assert.equal(leadEntry.subroles[0].bullets.length, 3, 'leading sub-role bullets lost');
 
 /** Count paragraphs carrying a given style in a document.xml string. */
 const styleCount = (doc, styleId) =>
@@ -160,12 +162,12 @@ for (const text of [
 const contactParagraph = leadingDoc.match(/<w:p><w:pPr><w:pStyle w:val="Contact"\/>.*?<\/w:p>/);
 assert(contactParagraph, 'contact paragraph missing');
 assert(
-  !/operating rhythm|fractional engagements|2021-Present/.test(contactParagraph[0]),
+  !/operating rhythm|concurrent fractional|2021-Present/.test(contactParagraph[0]),
   'body content below a pre-section heading was swept into the contact line',
 );
 assert.equal(
   styleCount(leadingDoc, 'Bullet'),
-  3,
+  6,
   'both pre-section bullets and the Education bullet should render as bullets',
 );
 assert.equal(
@@ -175,14 +177,14 @@ assert.equal(
 );
 
 // A #### with no ### above it and no ## anywhere still has to reach the page.
-const orphanDoc = zipPart(
-  buildCvDocxBuffer(
-    '# CV -- Jordan Vale\n\n#### Advisory Practice\n\n- Built the operating system.\n',
-  ),
-  'word/document.xml',
-);
-assert(orphanDoc.includes('Advisory Practice'), 'orphan #### heading dropped');
-assert.equal(styleCount(orphanDoc, 'Bullet'), 1, 'orphan #### bullet should render as a bullet');
+// Assembled from the fixture for the same reason as above.
+const orphanMd = [
+  fixtureSlice('# CV -- Jordan Vale', '\n**Location:'),
+  fixtureSlice('#### Meridian Labs', '\n### Brightpath'),
+].join('\n\n');
+const orphanDoc = zipPart(buildCvDocxBuffer(orphanMd), 'word/document.xml');
+assert(orphanDoc.includes('Meridian Labs'), 'orphan #### heading dropped');
+assert.equal(styleCount(orphanDoc, 'Bullet'), 2, 'orphan #### bullets should render as bullets');
 assert.equal(styleCount(orphanDoc, 'SectionHeader'), 0, 'orphan #### needs no section header');
 
 // An explicit ## whose text strips to empty is a different case from the
