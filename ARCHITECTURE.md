@@ -54,9 +54,12 @@ distinct paragraph style, their own right-flushed date, and bullets one list
 level deeper.
 
 Nesting that appears before the first `##` opens an implicit untitled section
-rather than being skipped for want of a parent. The renderer omits the header
-for a section with no title, so the entries simply lead the document. Silently
-dropping content is never the right answer to an unexpected heading order.
+rather than being skipped for want of a parent. That section carries an
+`implicit` flag, and the renderer omits the header only for a section carrying
+it, so the entries simply lead the document. The flag rather than the empty
+title is what the renderer keys on: an explicit `##` whose heading text strips
+to empty was still asked for, and keeps its header rule. Silently dropping
+content is never the right answer to an unexpected heading order.
 
 ## Data flow
 

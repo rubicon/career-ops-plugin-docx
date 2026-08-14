@@ -185,4 +185,18 @@ assert(orphanDoc.includes('Advisory Practice'), 'orphan #### heading dropped');
 assert.equal(styleCount(orphanDoc, 'Bullet'), 1, 'orphan #### bullet should render as a bullet');
 assert.equal(styleCount(orphanDoc, 'SectionHeader'), 0, 'orphan #### needs no section header');
 
+// An explicit ## whose text strips to empty is a different case from the
+// implicit section: the author asked for a section, so the divider rule the
+// SectionHeader style carries still belongs on the page. Suppression keys on
+// how the section was opened, not on whether its title happens to be empty.
+const emptyHeadingDoc = zipPart(
+  buildCvDocxBuffer('## ** **\n\n- Only the header rule matters here.\n'),
+  'word/document.xml',
+);
+assert.equal(
+  styleCount(emptyHeadingDoc, 'SectionHeader'),
+  1,
+  'an explicit ## with empty heading text keeps its section header rule',
+);
+
 console.log('✓ smoke ok:', keys.join(', '));
