@@ -53,6 +53,11 @@ umbrella) instead of flattening them into separate jobs. Nested sub-roles get a
 distinct paragraph style, their own right-flushed date, and bullets one list
 level deeper.
 
+Nesting that appears before the first `##` opens an implicit untitled section
+rather than being skipped for want of a parent. The renderer omits the header
+for a section with no title, so the entries simply lead the document. Silently
+dropping content is never the right answer to an unexpected heading order.
+
 ## Data flow
 
 ```
