@@ -36,6 +36,10 @@ underneath it. Each nested sub-role gets its own right-flushed date and
 deeper-indented bullets, instead of being flattened into separate jobs. A `###`
 with no `####` children renders as an ordinary role.
 
+A `###` or `####` that sits above your first `##` renders too: it leads the
+document as an untitled section, with no section header of its own. Nothing you
+write is dropped for being in the wrong place in the hierarchy.
+
 There is a runnable, non-personal example at
 [`examples/cv-fractional-example.md`](examples/cv-fractional-example.md):
 
