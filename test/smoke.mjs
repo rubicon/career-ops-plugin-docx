@@ -8,6 +8,7 @@ import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { inflateRawSync } from 'node:zlib';
 import { parseCvMarkdown, buildCvDocxBuffer } from '../lib/cv-docx.mjs';
+import hooks from '../index.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.join(here, '..');
@@ -15,8 +16,6 @@ const KINDS = ['provider', 'ingest', 'search', 'notify', 'export'];
 
 // --- Manifest ↔ index hook contract (the template's baseline check) ---------
 const manifest = JSON.parse(readFileSync(path.join(root, 'manifest.json'), 'utf8'));
-const mod = await import(path.join(root, manifest.entry || 'index.mjs'));
-const hooks = mod.default;
 
 assert(hooks && typeof hooks === 'object', 'default export must be an object of hooks');
 const keys = Object.keys(hooks);
